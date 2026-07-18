@@ -10,12 +10,23 @@ from services.alpha_vantage_client import AlphaVantageClient
 class MainWindow(QMainWindow):
     @Slot(str)
     def handle_company_symbol(self,symbol):
-            company=self.alphaclient.get_company_overview(symbol)
-            if company is None:
-                 self.user_widget.show_company_not_found()
-                 return
+        company=self.alphaclient.get_company_overview(symbol)
+        if company is None:
+            self.user_widget.company_info_widget.show_company_not_found()
+            return
 
-            self.user_widget.update_company_info(company)
+        self.user_widget.company_info_widget.update_company_info(company)
+    
+
+    @Slot(dict)
+    def handle_watch_list(self,company_info):
+        if company_info in self.watch_list_widget.company_list:
+            self.user_widget.company_info_widget.show_company_not_found()
+            return
+        
+        self.watch_list_widget.add_to_watch_list(company_info)
+        self.user_widget.company_info_widget.show_company_not_found()
+         
 
     
 
@@ -35,3 +46,4 @@ class MainWindow(QMainWindow):
         main_layout.setContentsMargins(20,20,20,20)
         main_layout.setSpacing(30)
         self.user_widget.searchbar.companySearched.connect(self.handle_company_symbol)
+        self.user_widget.company_info_widget.addToWatchListRequested.connect(self.handle_watch_list)
