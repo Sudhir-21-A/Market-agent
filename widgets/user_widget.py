@@ -34,7 +34,13 @@ class UserWidget(QWidget):
     
 
     def update_company_info(self,company):
-        self.company_name_label.setText(f'Company Name: {company['Name']}')
-        self.company_symbol_label.setText(f'Company Symbol: {company['Symbol']}')
-        self.company_country_label.setText(f'Company Country: {company['Country']}')
-        self.company_industry_label.setText(f'Company Industry: {company['Industry']}')
+        self.company_name_label.setText(f'Company Name: {company.get('Name','Not found')}')
+        self.company_symbol_label.setText(f'Company Symbol: {company.get('Symbol','-')}')
+        self.company_country_label.setText(f'Company Country: {company.get('Country','-')}')
+        self.company_industry_label.setText(f'Company Industry: {company.get('Industry','-')}')
+
+    def show_company_not_found(self):
+        self.company_name_label.setText(f'Company Not found')
+        self.company_symbol_label.setText(f'Company Symbol: -')
+        self.company_country_label.setText(f'Company Country: -')
+        self.company_industry_label.setText(f'Company Industry: -')

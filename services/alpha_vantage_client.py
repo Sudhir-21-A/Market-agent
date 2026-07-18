@@ -22,13 +22,36 @@ class AlphaVantageClient():
         print(f'Error {response.status_code}')
         return None
     
+    def _is_valid(self,data):
+        
+        if data is None:
+            return False
+
+        if not data:
+            return False
+        
+        if "Error Message" in data:
+            return False
+        
+        return True
+    
     def get_company_overview(self,symbol):
-        return self.make_request("OVERVIEW",symbol)
+        data= self.make_request("OVERVIEW",symbol)
+
+        if not self._is_valid(data):
+            return None
+        
+        return data
 
     
     def get_global_quote(self,symbol):
-        return self.make_request("GLOBAL_QUOTE",symbol)
-    
+        data=self.make_request("GLOBAL_QUOTE",symbol)
+        
+        if not self._is_valid(data):
+            return None
+        
+        return data
+
 
 
 

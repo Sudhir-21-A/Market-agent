@@ -11,6 +11,10 @@ class MainWindow(QMainWindow):
     @Slot(str)
     def handle_company_symbol(self,symbol):
             company=self.alphaclient.get_company_overview(symbol)
+            if company is None:
+                 self.user_widget.show_company_not_found()
+                 return
+
             self.user_widget.update_company_info(company)
 
     
