@@ -16,7 +16,6 @@ class AlphaVantageClient():
             "apikey":self.api_key
         }
         response=requests.get(self.base_url,params=params)
-        print(response.url)
         if response.status_code==200:
             return response.json()
 

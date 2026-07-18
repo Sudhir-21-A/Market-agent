@@ -1,8 +1,10 @@
 from PySide6.QtWidgets import QWidget,QHBoxLayout,QLineEdit,QPushButton
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt,Signal
 
 
 class SearchBarWidget(QWidget):
+    
+    companySearched=Signal(str)
     def __init__(self):
         super(). __init__()
         layout=QHBoxLayout(self)
@@ -23,5 +25,11 @@ class SearchBarWidget(QWidget):
         if not search_text:
             return 
         
+
+        self.companySearched.emit(search_text)
         
-        print(f'Searching: {search_text}')
+        
+
+
+
+
