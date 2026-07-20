@@ -19,11 +19,17 @@ class MainWindow(QMainWindow):
     
 
     @Slot(dict)
-    def handle_watch_list(self,company_info):
-        if company_info in self.watch_list_widget.company_list:
-            self.user_widget.company_info_widget.show_company_not_found()
-            return
+    def handle_watch_list(self,overview):
+        for company in self.watch_list_widget.company_list:
+            if company['overview']['Symbol'] == overview['Symbol']:
+                self.user_widget.company_info_widget.clear_company_not_found()
+                return
         
+        quote=self.alphaclient.get_global_quote(overview['Symbol'])
+        company_info={
+            'overview':overview,
+            'quote':quote
+        }
         self.watch_list_widget.add_to_watch_list(company_info)
         self.user_widget.company_info_widget.show_company_not_found()
          

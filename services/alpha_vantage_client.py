@@ -50,7 +50,7 @@ class AlphaVantageClient():
         if not self._is_valid(data):
             return None
         
-        return data
+        return data['Global Quote']
 
 
 
