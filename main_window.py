@@ -3,19 +3,19 @@ from PySide6.QtCore import Qt,Slot
 from widgets.user_widget import UserWidget
 from widgets.watch_list_widget import WatchListWidget
 from widgets.recent_widget import RecentWidget
-from services.alpha_vantage_client import AlphaVantageClient
+from services.finnhub_client import FinnhubClient
 
 
 
 class MainWindow(QMainWindow):
     @Slot(str)
     def handle_company_symbol(self,symbol):
-        company=self.alphaclient.get_company_overview(symbol)
-        if company is None:
+        profile=self.finnhubclient.get_company_profile(symbol)
+        if profile is None:
             self.user_widget.company_info_widget.show_company_not_found()
             return
 
-        self.user_widget.company_info_widget.update_company_info(company)
+        self.user_widget.company_info_widget.update_company_info(profile)
     
 
     @Slot(dict)
@@ -25,7 +25,7 @@ class MainWindow(QMainWindow):
                 self.user_widget.company_info_widget.clear_company_not_found()
                 return
         
-        quote=self.alphaclient.get_global_quote(overview['Symbol'])
+        quote=self.finnhubclient.get_quote(overview['Symbol'])
         company_info={
             'overview':overview,
             'quote':quote
@@ -38,7 +38,7 @@ class MainWindow(QMainWindow):
 
     def __init__(self):
         super().__init__()
-        self.alphaclient=AlphaVantageClient()
+        self.finnhubclient=FinnhubClient()
         maincontainer=QWidget()
         self.setWindowTitle('Home')
         self.setCentralWidget(maincontainer)

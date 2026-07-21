@@ -21,7 +21,7 @@ class WatchListWidget(QWidget):
     def display_watch_list(self,list):
         self.watch_list.clear()
         for company in list:
-            self.watch_list.addItem(f'{company['overview']['Name']} ({company['overview']['Symbol']}) ${company['quote']['05. price']}   {company['quote']['10. change percent']}')
+            self.watch_list.addItem(f'{company['overview']['Name']} \t({company['overview']['Symbol']}) \tCurrent Price: ${company['quote']['CurrentPrice']}   \tChange Percent: {company['quote']['ChangePercent']}%')
     
 
     def add_to_watch_list(self,company):
