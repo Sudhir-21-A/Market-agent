@@ -22,7 +22,7 @@ class MainWindow(QMainWindow):
     def handle_watch_list(self,overview):
         for company in self.watch_list_widget.company_list:
             if company['overview']['Symbol'] == overview['Symbol']:
-                self.user_widget.company_info_widget.clear_company_not_found()
+                self.user_widget.company_info_widget.clear_company_info()
                 return
         
         quote=self.finnhubclient.get_quote(overview['Symbol'])
@@ -32,6 +32,15 @@ class MainWindow(QMainWindow):
         }
         self.watch_list_widget.add_to_watch_list(company_info)
         self.user_widget.company_info_widget.show_company_not_found()
+    
+
+    @Slot(list)
+    def handle_refresh(self,company_list):
+        for company in company_list:
+            company['quote']=self.finnhubclient.get_quote(company['overview']['Symbol'])
+        
+        self.watch_list_widget.refresh_watch_list(company_list)
+
          
 
     
@@ -53,3 +62,4 @@ class MainWindow(QMainWindow):
         main_layout.setSpacing(30)
         self.user_widget.searchbar.companySearched.connect(self.handle_company_symbol)
         self.user_widget.company_info_widget.addToWatchListRequested.connect(self.handle_watch_list)
+        self.watch_list_widget.refreshRequested.connect(self.handle_refresh)

@@ -26,7 +26,7 @@ class CompanyInfoWidget(QWidget):
         company_info_layout.setSpacing(10)
         company_main_layout=QVBoxLayout(self)
         company_main_layout.addWidget(company_info_frame)
-        company_main_layout.addWidget(self.add_to_watchlist_button)
+        company_main_layout.addWidget(self.add_to_watchlist_button,alignment=Qt.AlignRight)
         self.add_to_watchlist_button.clicked.connect(self.to_add_company)
     
 
@@ -41,7 +41,7 @@ class CompanyInfoWidget(QWidget):
         self.add_to_watchlist_button.setText('Add to Watchlist')
 
 
-    def clear_company_not_found(self):
+    def clear_company_info(self):
         self.company_name_label.setText(f'Company Name: -')
         self.company_symbol_label.setText(f'Company Symbol: -')
         self.company_country_label.setText(f'Company Country: -')
@@ -50,9 +50,10 @@ class CompanyInfoWidget(QWidget):
         self.add_to_watchlist_button.hide()
     
     def show_company_not_found(self):
-        self.clear_company_not_found()
+        self.clear_company_info()
 
     def to_add_company(self):
         self.addToWatchListRequested.emit(self.current_company)
         self.add_to_watchlist_button.setEnabled(False)
         self.add_to_watchlist_button.setText('Adding...')
+        
