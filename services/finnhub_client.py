@@ -12,12 +12,8 @@ class FinnhubClient():
         self.base_url="https://finnhub.io/api/v1"
 
     
-    def make_request(self,endpoint,symbol):
+    def make_request(self,endpoint,params):
         url=self.base_url+endpoint
-        params={
-            'symbol':symbol,
-            'token': self.api_key
-        }
         response=requests.get(url,params=params)
         if response.status_code==200:
             data=response.json()
@@ -39,7 +35,11 @@ class FinnhubClient():
     
 
     def get_company_profile(self,symbol):
-        company_profile=self.make_request("/stock/profile2",symbol)
+        params={
+                'symbol':symbol,
+                'token': self.api_key
+        }
+        company_profile=self.make_request("/stock/profile2",params)
         
         if not self._is_valid(company_profile):
             return None
@@ -56,7 +56,11 @@ class FinnhubClient():
     
 
     def get_quote(self,symbol):
-        quote=self.make_request("/quote",symbol)
+        params={
+                'symbol':symbol,
+                'token': self.api_key
+        }
+        quote=self.make_request("/quote",params)
 
         if not self._is_valid(quote):
             return None
@@ -65,4 +69,20 @@ class FinnhubClient():
             'CurrentPrice': quote.get('c'),
             'ChangePercent': quote.get('dp')
         }
+
+
+    def get_symbol(self,query):
+        params={
+                'q':query,
+                'exchange': 'US',
+                'token': self.api_key
+        }
+        query_list=self.make_request("/search",params)
+
+        if not self._is_valid(query_list):
+            return None
+
+        return query_list['result']
+
+        
         

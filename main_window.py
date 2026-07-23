@@ -9,13 +9,22 @@ from services.finnhub_client import FinnhubClient
 
 class MainWindow(QMainWindow):
     @Slot(str)
-    def handle_company_symbol(self,symbol):
+    def handle_company_search(self,symbol):
+        profile=self.finnhubclient.get_company_profile(symbol)
+        if profile is None:
+            query=self.finnhubclient.get_symbol(symbol)
+            self.user_widget.show_search_results(query)
+        else:
+            self.user_widget.show_company_profile(profile)
+
+
+    def handle_search_item_clicked(self,symbol):
         profile=self.finnhubclient.get_company_profile(symbol)
         if profile is None:
             self.user_widget.company_info_widget.show_company_not_found()
-            return
+            return 
 
-        self.user_widget.company_info_widget.update_company_info(profile)
+        self.user_widget.show_company_profile(profile)
     
 
     @Slot(dict)
@@ -60,6 +69,7 @@ class MainWindow(QMainWindow):
         main_layout.addWidget(self.recent_widget)
         main_layout.setContentsMargins(20,20,20,20)
         main_layout.setSpacing(30)
-        self.user_widget.searchbar.companySearched.connect(self.handle_company_symbol)
+        self.user_widget.searchbar.companySearched.connect(self.handle_company_search)
         self.user_widget.company_info_widget.addToWatchListRequested.connect(self.handle_watch_list)
         self.watch_list_widget.refreshRequested.connect(self.handle_refresh)
+        self.user_widget.search_results_widget.companySelected.connect(self.handle_search_item_clicked)

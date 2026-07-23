@@ -53,7 +53,7 @@ class CompanyInfoWidget(QWidget):
         self.clear_company_info()
 
     def to_add_company(self):
-        self.addToWatchListRequested.emit(self.current_company)
         self.add_to_watchlist_button.setEnabled(False)
         self.add_to_watchlist_button.setText('Adding...')
+        self.addToWatchListRequested.emit(self.current_company)
         
