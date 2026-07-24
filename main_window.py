@@ -1,8 +1,9 @@
 from PySide6.QtWidgets import QMainWindow,QWidget,QVBoxLayout,QHBoxLayout,QLabel,QLineEdit,QPushButton,QListWidget,QFrame
 from PySide6.QtCore import Qt,Slot
+import webbrowser
 from widgets.user_widget import UserWidget
 from widgets.watch_list_widget import WatchListWidget
-from widgets.recent_news_widget import RecentWidget
+from widgets.recent_news_widget import RecentNewsWidget
 from services.finnhub_client import FinnhubClient
 from services.newsapi_client import NewsApiClient
 
@@ -26,6 +27,10 @@ class MainWindow(QMainWindow):
             return 
 
         self.user_widget.show_company_profile(profile)
+
+
+    def handle_article_doubleclicked(self,url):
+        webbrowser.open_new(url)
     
 
     @Slot(dict)
@@ -74,7 +79,7 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(maincontainer)
         self.user_widget=UserWidget()
         self.watch_list_widget=WatchListWidget()
-        self.recent_widget=RecentWidget()
+        self.recent_widget=RecentNewsWidget()
         main_layout=QVBoxLayout(maincontainer)
         main_layout.addWidget(self.user_widget)
         main_layout.addWidget(self.watch_list_widget)
@@ -85,3 +90,4 @@ class MainWindow(QMainWindow):
         self.user_widget.company_info_widget.addToWatchListRequested.connect(self.handle_watch_list)
         self.watch_list_widget.refreshRequested.connect(self.handle_refresh)
         self.user_widget.search_results_widget.companySelected.connect(self.handle_search_item_clicked)
+        self.recent_widget.doubleclickedArticle.connect(self.handle_article_doubleclicked)
