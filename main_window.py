@@ -2,8 +2,9 @@ from PySide6.QtWidgets import QMainWindow,QWidget,QVBoxLayout,QHBoxLayout,QLabel
 from PySide6.QtCore import Qt,Slot
 from widgets.user_widget import UserWidget
 from widgets.watch_list_widget import WatchListWidget
-from widgets.recent_widget import RecentWidget
+from widgets.recent_news_widget import RecentWidget
 from services.finnhub_client import FinnhubClient
+from services.newsapi_client import NewsApiClient
 
 
 
@@ -45,10 +46,20 @@ class MainWindow(QMainWindow):
 
     @Slot(list)
     def handle_refresh(self,company_list):
+        new_company_list=[]
         for company in company_list:
             company['quote']=self.finnhubclient.get_quote(company['overview']['Symbol'])
-        
-        self.watch_list_widget.refresh_watch_list(company_list)
+            news=self.newsapiclient.get_news(company['overview']['Name'])
+            company_info={
+                'overview': company['overview'],
+                'quote': company['quote'],
+                'articles': news
+            }
+            new_company_list.append(company_info)
+
+
+        self.watch_list_widget.refresh_watch_list(new_company_list)
+        self.recent_widget.show_articles(new_company_list)
 
          
 
@@ -57,6 +68,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.finnhubclient=FinnhubClient()
+        self.newsapiclient=NewsApiClient()
         maincontainer=QWidget()
         self.setWindowTitle('Home')
         self.setCentralWidget(maincontainer)

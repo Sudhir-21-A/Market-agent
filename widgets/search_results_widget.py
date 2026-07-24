@@ -20,8 +20,10 @@ class SearchResultsWidget(QWidget):
 
     def show_results(self,query_list):
         self.search_results_list.clear()
+        count=0
         for result in query_list:
-            item=QListWidgetItem(f'Company Name: {result['description']}\t({result['symbol']})')
+            count+=1
+            item=QListWidgetItem(f'{count}) {result['description']}\t({result['symbol']})')
             item.setData(Qt.ItemDataRole.UserRole,result['symbol'])
             self.search_results_list.addItem(item)
 
