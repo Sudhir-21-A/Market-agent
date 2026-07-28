@@ -1,11 +1,13 @@
-from PySide6.QtWidgets import QMainWindow,QWidget,QVBoxLayout,QHBoxLayout,QLabel,QLineEdit,QPushButton,QListWidget,QFrame
+from PySide6.QtWidgets import QMainWindow,QWidget,QVBoxLayout,QHBoxLayout,QLabel,QLineEdit,QPushButton,QListWidget,QFrame,QDockWidget
 from PySide6.QtCore import Qt,Slot
 import webbrowser
 from widgets.user_widget import UserWidget
 from widgets.watch_list_widget import WatchListWidget
 from widgets.recent_news_widget import RecentNewsWidget
+from widgets.ai_explanation_widget import ExplanationDockWidget
 from services.finnhub_client import FinnhubClient
 from services.newsapi_client import NewsApiClient
+from services.gemini_llm_client import GeminiClient
 
 
 
@@ -47,7 +49,17 @@ class MainWindow(QMainWindow):
         }
         self.watch_list_widget.add_to_watch_list(company_info)
         self.user_widget.company_info_widget.show_company_not_found()
-    
+
+
+    def handle_ai(self,company_info):
+        self.ai_explanation_widget.show()
+        explanation=self.geminiclient.get_gemini_explanation(company_info)
+        if explanation is None:
+            self.ai_explanation_widget.hide()
+            return
+        else:
+            self.ai_explanation_widget.show_info(explanation)
+
 
     @Slot(list)
     def handle_refresh(self,company_list):
@@ -74,16 +86,19 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.finnhubclient=FinnhubClient()
         self.newsapiclient=NewsApiClient()
+        self.geminiclient=GeminiClient()
         maincontainer=QWidget()
         self.setWindowTitle('Home')
         self.setCentralWidget(maincontainer)
         self.user_widget=UserWidget()
         self.watch_list_widget=WatchListWidget()
         self.recent_widget=RecentNewsWidget()
+        self.ai_explanation_widget=ExplanationDockWidget()
         main_layout=QVBoxLayout(maincontainer)
         main_layout.addWidget(self.user_widget)
         main_layout.addWidget(self.watch_list_widget)
         main_layout.addWidget(self.recent_widget)
+        self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea,self.ai_explanation_widget)
         main_layout.setContentsMargins(20,20,20,20)
         main_layout.setSpacing(30)
         self.user_widget.searchbar.companySearched.connect(self.handle_company_search)
@@ -91,3 +106,4 @@ class MainWindow(QMainWindow):
         self.watch_list_widget.refreshRequested.connect(self.handle_refresh)
         self.user_widget.search_results_widget.companySelected.connect(self.handle_search_item_clicked)
         self.recent_widget.doubleclickedArticle.connect(self.handle_article_doubleclicked)
+        self.recent_widget.explanationAsked.connect(self.handle_ai)
