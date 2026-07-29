@@ -67,7 +67,8 @@ class FinnhubClient():
         
         return {
             'CurrentPrice': quote.get('c'),
-            'ChangePercent': quote.get('dp')
+            'ChangePercent': quote.get('dp'),
+            'ChangeAmount':quote.get('d')
         }
 
 

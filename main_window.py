@@ -51,7 +51,7 @@ class MainWindow(QMainWindow):
         self.user_widget.company_info_widget.show_company_not_found()
 
 
-    def handle_ai(self,company_info):
+    def handle_ai_explanation(self,company_info):
         self.ai_explanation_widget.show()
         explanation=self.geminiclient.get_gemini_explanation(company_info)
         if explanation is None:
@@ -106,4 +106,4 @@ class MainWindow(QMainWindow):
         self.watch_list_widget.refreshRequested.connect(self.handle_refresh)
         self.user_widget.search_results_widget.companySelected.connect(self.handle_search_item_clicked)
         self.recent_widget.doubleclickedArticle.connect(self.handle_article_doubleclicked)
-        self.recent_widget.explanationAsked.connect(self.handle_ai)
+        self.recent_widget.explanationAsked.connect(self.handle_ai_explanation)

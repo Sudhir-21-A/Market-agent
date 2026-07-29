@@ -1,6 +1,7 @@
 import os
 from dotenv import load_dotenv
 import requests
+from datetime import datetime,timezone
 
 load_dotenv()
 
@@ -15,7 +16,6 @@ class GeminiClient():
         }
 
     def get_llm_response(self,headers,json):
-        # print('\nRequesting...')
         try:
             response=requests.post(self.base_url,headers=headers,json=json)
             response.raise_for_status()
@@ -31,25 +31,32 @@ class GeminiClient():
         name=company_info['overview']['Name']
         current_price=company_info['quote']['CurrentPrice']
         change_percent=company_info['quote']['ChangePercent']
+        if change_percent>0:
+            sign='+'
+        else:
+            sign=''
         prompt=f'''
+Current Date: {datetime.now(timezone.utc)}
 Company Name: {name}
-Current Price: {current_price}
-Today's Change Percentage: {change_percent}%
-Articles:'''
+Current Price: ${current_price}
+Today's Change : {sign}${company_info['quote']['ChangeAmount']} ({sign}{change_percent}%)
+Recent Articles (newest first):'''
         count=1
         for article in company_info['articles']:
-            prompt+=f'\n{count}. {article['Title']}'
+            prompt+=f'\n{count}.\n{article['Name']}\nTitle: {article['Title']}\nPublished: {article['Published']}'
             count+=1
         prompt+='''
-You are a financial assistant.
-Only use the supplied information.
-Explain the stock movement in no more than 150 words.
-Do not speculate.'''
+Task:
+- Explain today's stock movement.
+- Relate your explanation to the supplied articles.
+- If the articles do not sufficiently explain the movement, explicitly say so.
+- Do not speculate or invent causes.
+- Keep the response under 150 words.
+- Use clear, concise language suitable for an investor dashboard'''
         return prompt
 
 
     def get_gemini_explanation(self,company_info):
-        # print("Getting prompt...\n")
         prompt=self.get_prompt(company_info)
         headers={
                 'Content-Type': "application/json",
