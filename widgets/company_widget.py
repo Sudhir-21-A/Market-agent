@@ -27,6 +27,7 @@ class CompanyInfoWidget(QWidget):
         company_main_layout=QVBoxLayout(self)
         company_main_layout.addWidget(company_info_frame)
         company_main_layout.addWidget(self.add_to_watchlist_button,alignment=Qt.AlignRight)
+        self.hide()
         self.add_to_watchlist_button.clicked.connect(self.to_add_company)
     
 
@@ -35,6 +36,7 @@ class CompanyInfoWidget(QWidget):
         self.company_symbol_label.setText(f'Company Symbol: {company.get('Symbol','-')}')
         self.company_country_label.setText(f'Company Country: {company.get('Country','-')}')
         self.company_industry_label.setText(f'Company Industry: {company.get('Industry','-')}')
+        self.show()
         self.current_company=company
         self.add_to_watchlist_button.show()
         self.add_to_watchlist_button.setEnabled(True)
@@ -48,9 +50,11 @@ class CompanyInfoWidget(QWidget):
         self.company_industry_label.setText(f'Company Industry: -')
         self.current_company={}
         self.add_to_watchlist_button.hide()
+        self.hide()
     
     def show_company_not_found(self):
         self.clear_company_info()
+        self.show()
 
     def to_add_company(self):
         self.add_to_watchlist_button.setEnabled(False)

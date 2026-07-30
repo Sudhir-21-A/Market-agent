@@ -36,19 +36,22 @@ class MainWindow(QMainWindow):
     
 
     @Slot(dict)
-    def handle_watch_list(self,overview):
+    def handle_watch_list_news(self,overview):
         for company in self.watch_list_widget.company_list:
             if company['overview']['Symbol'] == overview['Symbol']:
                 self.user_widget.company_info_widget.clear_company_info()
                 return
         
         quote=self.finnhubclient.get_quote(overview['Symbol'])
+        articles=self.newsapiclient.get_news(overview['Name'])
         company_info={
             'overview':overview,
-            'quote':quote
+            'quote':quote,
+            'articles':articles
         }
         self.watch_list_widget.add_to_watch_list(company_info)
-        self.user_widget.company_info_widget.show_company_not_found()
+        self.recent_widget.show_added_company_article(company_info)
+        self.user_widget.company_info_widget.clear_company_info()
 
 
     def handle_ai_explanation(self,company_info):
@@ -76,7 +79,7 @@ class MainWindow(QMainWindow):
 
 
         self.watch_list_widget.refresh_watch_list(new_company_list)
-        self.recent_widget.show_articles(new_company_list)
+        self.recent_widget.show_articles_refresh(new_company_list)
 
          
 
@@ -102,7 +105,7 @@ class MainWindow(QMainWindow):
         main_layout.setContentsMargins(20,20,20,20)
         main_layout.setSpacing(30)
         self.user_widget.searchbar.companySearched.connect(self.handle_company_search)
-        self.user_widget.company_info_widget.addToWatchListRequested.connect(self.handle_watch_list)
+        self.user_widget.company_info_widget.addToWatchListRequested.connect(self.handle_watch_list_news)
         self.watch_list_widget.refreshRequested.connect(self.handle_refresh)
         self.user_widget.search_results_widget.companySelected.connect(self.handle_search_item_clicked)
         self.recent_widget.doubleclickedArticle.connect(self.handle_article_doubleclicked)

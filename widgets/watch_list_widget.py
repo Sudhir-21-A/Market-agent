@@ -1,5 +1,6 @@
 from PySide6.QtWidgets import QWidget,QVBoxLayout,QLabel,QListWidget,QFrame,QPushButton
 from PySide6.QtCore import Qt,Signal
+from PySide6.QtGui import QFont
 
 
 
@@ -15,14 +16,18 @@ class WatchListWidget(QWidget):
         Frame.setFrameShape(QFrame.Shape.Box)
         watchlistFrameLayout=QVBoxLayout(Frame)
         watchlabel=QLabel('Current Watchlist:')
+        watchlabel_font=watchlabel.font()
+        watchlabel_font.setPointSize(12)
+        watchlabel_font.setWeight(QFont.DemiBold)
+        watchlabel.setFont(watchlabel_font)
         layout=QVBoxLayout(self)
         self.watch_list=QListWidget()
         self.refresh_button=QPushButton('Refresh')
         self.refresh_button.hide()
-        watchlistFrameLayout.addWidget(watchlabel)
         watchlistFrameLayout.addWidget(self.watch_list)
         watchlistFrameLayout.addWidget(self.refresh_button,alignment=Qt.AlignRight)
         watchlistFrameLayout.setSpacing(20)
+        layout.addWidget(watchlabel)
         layout.addWidget(Frame)
         self.refresh_button.clicked.connect(self.to_refresh)
     
