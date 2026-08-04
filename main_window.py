@@ -81,6 +81,10 @@ class MainWindow(QMainWindow):
         self.watch_list_widget.refresh_watch_list(new_company_list)
         self.recent_widget.show_articles_refresh(new_company_list)
 
+
+
+    def handle_delete(self,company_list):
+        self.recent_widget.display_after_delete(company_list)
          
 
     
@@ -110,3 +114,4 @@ class MainWindow(QMainWindow):
         self.user_widget.search_results_widget.companySelected.connect(self.handle_search_item_clicked)
         self.recent_widget.doubleclickedArticle.connect(self.handle_article_doubleclicked)
         self.recent_widget.explanationAsked.connect(self.handle_ai_explanation)
+        self.watch_list_widget.deleteRequested.connect(self.handle_delete)

@@ -88,8 +88,16 @@ class RecentNewsWidget(QWidget):
         self.explanation_button.setEnabled(False)
         self.explanationAsked.emit(self.current_selected)
 
+    def display_after_delete(self,company_list):
+        if not company_list:
+            self.back_to_default()
 
-
+        else:
+            self.show_articles_refresh(company_list)
+            
+    def back_to_default(self):
+        self.recent_list.clear()
+        self.explanation_button.setEnabled(False)
          
 
             
