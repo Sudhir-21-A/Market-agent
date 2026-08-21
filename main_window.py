@@ -8,6 +8,7 @@ from widgets.ai_explanation_widget import ExplanationDockWidget
 from services.finnhub_client import FinnhubClient
 from services.newsapi_client import NewsApiClient
 from services.gemini_llm_client import GeminiClient
+from services.db_client import DbClient
 
 
 
@@ -50,6 +51,8 @@ class MainWindow(QMainWindow):
             'articles':articles
         }
         self.watch_list_widget.add_to_watch_list(company_info)
+        self.dbclient.add_company(company_info['overview']['Symbol'],company_info['overview']['Name'])
+        self.dbclient.show_table()
         self.recent_widget.show_added_company_article(company_info)
         self.user_widget.company_info_widget.clear_company_info()
 
@@ -82,10 +85,32 @@ class MainWindow(QMainWindow):
         self.recent_widget.show_articles_refresh(new_company_list)
 
 
+    @Slot(str)
+    def handle_delete(self,removed_company_symbol:str):
+        self.dbclient.delete_company(removed_company_symbol)
+        self.recent_widget.display_after_delete(removed_company_symbol)
+        self.dbclient.show_table() 
 
-    def handle_delete(self,company_list):
-        self.recent_widget.display_after_delete(company_list)
-         
+
+
+
+    def handle_watchlist_on_start(self):
+        self.dbclient.show_table()
+        company_list=self.dbclient.get_companies()
+        company_info_list=[]
+        for symbol in company_list:
+            overview=self.finnhubclient.get_company_profile(symbol)
+            quote=self.finnhubclient.get_quote(symbol)
+            article=self.newsapiclient.get_news(overview['Name'])
+            company_info={
+                'overview':overview,
+                'quote':quote,
+                'articles':article
+            }
+            company_info_list.append(company_info)
+        if company_info_list:
+            self.watch_list_widget.show_on_startup(company_info_list)
+            self.recent_widget.show_on_startup(company_info_list)
 
     
 
@@ -94,6 +119,7 @@ class MainWindow(QMainWindow):
         self.finnhubclient=FinnhubClient()
         self.newsapiclient=NewsApiClient()
         self.geminiclient=GeminiClient()
+        self.dbclient=DbClient()
         maincontainer=QWidget()
         self.setWindowTitle('Home')
         self.setCentralWidget(maincontainer)
@@ -108,10 +134,11 @@ class MainWindow(QMainWindow):
         self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea,self.ai_explanation_widget)
         main_layout.setContentsMargins(20,20,20,20)
         main_layout.setSpacing(30)
+        self.handle_watchlist_on_start()
         self.user_widget.searchbar.companySearched.connect(self.handle_company_search)
         self.user_widget.company_info_widget.addToWatchListRequested.connect(self.handle_watch_list_news)
         self.watch_list_widget.refreshRequested.connect(self.handle_refresh)
         self.user_widget.search_results_widget.companySelected.connect(self.handle_search_item_clicked)
         self.recent_widget.doubleclickedArticle.connect(self.handle_article_doubleclicked)
         self.recent_widget.explanationAsked.connect(self.handle_ai_explanation)
-        self.watch_list_widget.deleteRequested.connect(self.handle_delete)
+        self.watch_list_widget.companyRemoved.connect(self.handle_delete)

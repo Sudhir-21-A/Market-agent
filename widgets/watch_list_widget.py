@@ -7,7 +7,7 @@ from PySide6.QtGui import QFont
 class WatchListWidget(QWidget):
 
     refreshRequested=Signal(list)
-    deleteRequested=Signal(list)
+    companyRemoved=Signal(str)
 
     def __init__(self):
         super(). __init__()
@@ -86,7 +86,7 @@ class WatchListWidget(QWidget):
                 self.company_list.remove(company)
                 break
         self.show_after_delete()
-        self.deleteRequested.emit(self.company_list)
+        self.companyRemoved.emit(self.current_company)
 
     
 
@@ -98,6 +98,9 @@ class WatchListWidget(QWidget):
             self.display_watch_list(self.company_list)
 
 
+    def show_on_startup(self,company_info_list:list):
+        self.company_list=company_info_list
+        self.display_watch_list(self.company_list)
 
     def back_to_default(self):
         self.watch_list.clear()

@@ -37,15 +37,19 @@ class RecentNewsWidget(QWidget):
 
 
 
-    def show_articles_refresh(self,company_list:list):
+    def display_articles_list(self,company_list:list):
         self.recent_list.clear()
         self.company_info_list=company_list
         for company in self.company_info_list:
-                company_item=QTreeWidgetItem(self.recent_list,[company['overview']['Name']])
-                company_item.setData(0,Qt.ItemDataRole.UserRole,company['overview']['Symbol'])
-                for article in company['articles']:
-                        article_item=QTreeWidgetItem(company_item,[article['Title'],f'{article['Name']}\t{article['Published']}'])
-                        article_item.setData(0,Qt.ItemDataRole.UserRole,article['Url'])
+            company_item=QTreeWidgetItem(self.recent_list,[company['overview']['Name']])
+            company_item.setData(0,Qt.ItemDataRole.UserRole,company['overview']['Symbol'])
+            for article in company['articles']:
+                article_item=QTreeWidgetItem(company_item,[article['Title'],f'{article['Name']}\t{article['Published']}'])
+                article_item.setData(0,Qt.ItemDataRole.UserRole,article['Url'])
+
+
+    def show_articles_refresh(self,company_list:list):
+        self.display_articles_list(company_list)
 
 
     def show_added_company_article(self,company_info:dict):
@@ -88,16 +92,27 @@ class RecentNewsWidget(QWidget):
         self.explanation_button.setEnabled(False)
         self.explanationAsked.emit(self.current_selected)
 
-    def display_after_delete(self,company_list):
-        if not company_list:
-            self.back_to_default()
+    def display_after_delete(self,removed_symbol):
+        for company in self.company_info_list:
+            if removed_symbol== company['overview']['Symbol']:
+                self.company_info_list.remove(company)
 
-        else:
-            self.show_articles_refresh(company_list)
+        for i in range(self.recent_list.topLevelItemCount()):
+            item=self.recent_list.topLevelItem(i)
+            symbol=item.data(0,Qt.ItemDataRole.UserRole)
+            if symbol==removed_symbol:
+                self.recent_list.takeTopLevelItem(i)
+                break
+
+        if self.recent_list.topLevelItemCount==0:
+            self.back_to_default()
             
     def back_to_default(self):
         self.recent_list.clear()
         self.explanation_button.setEnabled(False)
-         
+
+
+    def show_on_startup(self,company_info:list):
+        self.display_articles_list(company_info)
 
             
